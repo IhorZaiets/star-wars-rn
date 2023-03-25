@@ -1,4 +1,8 @@
 import { RootState } from "../../../../store/store";
+import { FetchListResponse } from "../../../../types";
+import { Character } from "../../types";
 import { STATE_KEY } from "../index";
 
-export const getNumber = (state: RootState): number => state[STATE_KEY].number;
+export const getCharactersPage = (
+  state: RootState
+): FetchListResponse<Character> | null => state[STATE_KEY].charactersPage;

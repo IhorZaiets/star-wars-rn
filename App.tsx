@@ -1,28 +1,20 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
 import { Provider } from "react-redux";
 
-import FeedScreen from "./src/features/feed/screens/FeedScreen";
+import { ThemeProvider } from "styled-components/native";
+
+import TabNavigator from "./src/features/navigation/components/TabNavigator";
 import { store } from "./src/store/store";
+import theme from "./src/theme";
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <View style={styles.container}>
-        <Text>Open up App.tsx to start working on your app!</Text>
-        <FeedScreen />
+    <ThemeProvider theme={theme}>
+      <Provider store={store}>
         <StatusBar style="auto" />
-      </View>
-    </Provider>
+        <TabNavigator />
+      </Provider>
+    </ThemeProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

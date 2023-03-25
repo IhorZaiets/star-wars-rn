@@ -1,34 +1,52 @@
 import React, { FC, useEffect } from "react";
-import { Text, TouchableOpacity } from "react-native";
+import { FlatList, ListRenderItem, SafeAreaView, Text } from "react-native";
 
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../../store/helpers/storeHooks";
-import { increment } from "../modules";
-import { useLazyGetWariorQuery } from "../modules/api";
-import { getNumber } from "../modules/selectors";
+import { useAppSelector } from "../../../store/helpers/storeHooks";
+import CharacterCard from "../components/CharacterCard";
+import { useLazyGetCharactersQuery } from "../modules/api";
+import { getCharactersPage } from "../modules/selectors";
+import { Character } from "../types";
 
 const FeedScreen: FC = () => {
-  const number = useAppSelector(getNumber);
-  const dispatch = useAppDispatch();
+  const charactersPage = useAppSelector(getCharactersPage);
 
-  const [getWarior] = useLazyGetWariorQuery();
+  const [getCharacters, { isLoading: isCharactersLoading }] =
+    useLazyGetCharactersQuery();
+
+  console.log(charactersPage?.results);
 
   useEffect(() => {
-    const async = async () => {
-      const res = await getWarior();
+    getCharacters({ path: "people" });
+  }, [getCharacters]);
 
-      console.log(res);
-    };
+  if (isCharactersLoading || !charactersPage?.results) {
+    return <Text>Loading</Text>;
+  }
 
-    async();
-  }, [getWarior]);
+  const renderItem: ListRenderItem<Character> = ({ item }) => (
+    <CharacterCard character={item} />
+  );
 
   return (
-    <TouchableOpacity onPress={() => dispatch(increment())}>
-      <Text>{number}</Text>
-    </TouchableOpacity>
+    <SafeAreaView>
+      <FlatList
+        data={charactersPage.results}
+        renderItem={renderItem}
+        style={{
+          padding: 16,
+        }}
+        onEndReached={({ distanceFromEnd }: { distanceFromEnd: number }) => {
+          if (distanceFromEnd === 0) return;
+          //as we receive full url in charactersPage.next, we replace the main part with
+          //an empty string
+          charactersPage.next &&
+            getCharacters({
+              path: charactersPage.next.replace("https://swapi.dev/api/", ""),
+            });
+        }}
+        onEndReachedThreshold={0.5}
+      />
+    </SafeAreaView>
   );
 };
 
