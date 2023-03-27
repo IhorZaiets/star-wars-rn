@@ -15,7 +15,10 @@ export interface Character {
   created: string;
   edited: string;
   url: string;
+  isLiked: boolean;
 }
+
+export type CharacterFromApi = Omit<Character, "isLiked">;
 
 export interface GetCharactersPayload {
   path: string;

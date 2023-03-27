@@ -1,13 +1,13 @@
+import LikeIcon from "../../../assets/like-icon.svg";
 import FeedIcon from "../assets/feed-icon.svg";
-import LikeIcon from "../assets/like-icon.svg";
-import { Routes } from "../types";
+import { TabRoutes } from "../types";
 
 export const getTabBarIcon = (routeName: string) => {
   switch (routeName) {
-    case Routes.FAVORITE: {
+    case TabRoutes.FAVORITE: {
       return LikeIcon;
     }
-    case Routes.FEED: {
+    case TabRoutes.FEED: {
       return FeedIcon;
     }
     default: {

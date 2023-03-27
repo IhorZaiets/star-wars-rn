@@ -1,11 +1,19 @@
 import React, { FC, useEffect } from "react";
-import { FlatList, ListRenderItem, SafeAreaView, Text } from "react-native";
+import { Platform, FlatList, ListRenderItem, SafeAreaView } from "react-native";
 
+import styled from "styled-components/native";
+
+import ItemSeparatorComponent from "../../../components/ItemSeparatorComponent";
+import Loader from "../../../components/Loader";
+import { getCorrectPath } from "../../../helpers/getCorrectPath";
 import { useAppSelector } from "../../../store/helpers/storeHooks";
+import theme from "../../../theme";
 import CharacterCard from "../components/CharacterCard";
 import { useLazyGetCharactersQuery } from "../modules/api";
 import { getCharactersPage } from "../modules/selectors";
 import { Character } from "../types";
+
+const isAndroid = Platform.OS === "android";
 
 const FeedScreen: FC = () => {
   const charactersPage = useAppSelector(getCharactersPage);
@@ -13,14 +21,12 @@ const FeedScreen: FC = () => {
   const [getCharacters, { isLoading: isCharactersLoading }] =
     useLazyGetCharactersQuery();
 
-  console.log(charactersPage?.results);
-
   useEffect(() => {
     getCharacters({ path: "people" });
   }, [getCharacters]);
 
   if (isCharactersLoading || !charactersPage?.results) {
-    return <Text>Loading</Text>;
+    return <Loader />;
   }
 
   const renderItem: ListRenderItem<Character> = ({ item }) => (
@@ -28,26 +34,38 @@ const FeedScreen: FC = () => {
   );
 
   return (
-    <SafeAreaView>
+    <StyledSafeArea>
+      <SText>List of Star Wars characters</SText>
       <FlatList
         data={charactersPage.results}
         renderItem={renderItem}
-        style={{
-          padding: 16,
-        }}
         onEndReached={({ distanceFromEnd }: { distanceFromEnd: number }) => {
           if (distanceFromEnd === 0) return;
           //as we receive full url in charactersPage.next, we replace the main part with
           //an empty string
           charactersPage.next &&
             getCharacters({
-              path: charactersPage.next.replace("https://swapi.dev/api/", ""),
+              path: getCorrectPath(charactersPage.next),
             });
         }}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ padding: 16 }}
         onEndReachedThreshold={0.5}
+        ItemSeparatorComponent={ItemSeparatorComponent}
       />
-    </SafeAreaView>
+    </StyledSafeArea>
   );
 };
+
+const StyledSafeArea = styled(SafeAreaView)`
+  flex: 1;
+`;
+
+const SText = styled.Text`
+  font-size: ${theme.fontSizes.xl}px;
+  text-align: center;
+  margin-top: ${isAndroid ? 40 : 10}px;
+  font-weight: 600;
+`;
 
 export default FeedScreen;

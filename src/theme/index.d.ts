@@ -5,12 +5,14 @@ declare module "styled-components" {
     colors: {
       white: string;
       black: string;
+      ebonyClay: string;
+      gray: string;
+      red: string;
+      brightBlue: string;
     };
     fontSizes: {
-      xxl: number;
       xl: number;
       l: number;
-      ll: number;
       m: number;
       s: number;
       xs: number;

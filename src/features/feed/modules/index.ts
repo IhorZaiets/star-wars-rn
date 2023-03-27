@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 import { FetchListResponse } from "../../../types";
 import { Character } from "../types";
@@ -18,18 +18,45 @@ export const initialState: AppState = {
 export const feedSlice = createSlice({
   name: STATE_KEY,
   initialState,
-  reducers: {},
+  reducers: {
+    toggleLike: (state, action: PayloadAction<string>) => {
+      if (state.charactersPage?.results) {
+        state.charactersPage.results = state.charactersPage?.results.map(
+          (character) =>
+            character.url === action.payload
+              ? { ...character, isLiked: !character.isLiked }
+              : character
+        );
+      }
+    },
+    resetLikes: (state) => {
+      if (state.charactersPage?.results) {
+        state.charactersPage.results = state.charactersPage?.results.map(
+          (character) => ({
+            ...character,
+            isLiked: false,
+          })
+        );
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder.addMatcher(
       feedApi.endpoints.getCharacters.matchFulfilled,
       (state, { payload }) => {
-        if (state.charactersPage?.results) {
+        const charactersWithLike = payload.results.map((item) => ({
+          ...item,
+          isLiked: false,
+        }));
+
+        // we check if previous page exist to ensure that the received page is not first
+        if (state.charactersPage?.results && payload.previous) {
           state.charactersPage = {
             ...payload,
-            results: [...state.charactersPage.results, ...payload.results],
+            results: [...state.charactersPage.results, ...charactersWithLike],
           };
         } else {
-          state.charactersPage = payload;
+          state.charactersPage = { ...payload, results: charactersWithLike };
         }
       }
     );
@@ -39,3 +66,5 @@ export const feedSlice = createSlice({
 const FeedReducer = feedSlice.reducer;
 
 export default FeedReducer;
+
+export const { toggleLike, resetLikes } = feedSlice.actions;

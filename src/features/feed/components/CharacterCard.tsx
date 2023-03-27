@@ -3,27 +3,49 @@ import { Text } from "react-native";
 
 import styled from "styled-components/native";
 
+import LikesButton from "../../../components/LikesButton";
+import { useAppDispatch } from "../../../store/helpers/storeHooks";
 import theme from "../../../theme";
+import { useAppNavigation } from "../../navigation/NavigationService";
+import { StackRoutes } from "../../navigation/types";
+import { toggleLike } from "../modules";
 import { Character } from "../types";
 
 interface CharacterCardProps {
   character: Character;
 }
 
-const CharacterCard: FC<CharacterCardProps> = ({ character }) => (
-  <CardContainer key={character.url}>
-    <CharacterName>{character.name}</CharacterName>
-    <InfoContainer>
+const CharacterCard: FC<CharacterCardProps> = ({ character }) => {
+  const dispatch = useAppDispatch();
+  const navigation = useAppNavigation();
+
+  return (
+    <CardContainer
+      key={character.url}
+      onPress={() =>
+        navigation.navigate(StackRoutes.CHARACTER_SCREEN, {
+          isLiked: character.isLiked,
+          characterUrl: character.url,
+        })
+      }
+    >
+      <CharacterName>{character.name}</CharacterName>
       <Text>Birth year: {character.birth_year}</Text>
       <Text>Gender: {character.gender}</Text>
-      <Text>Home: {character.homeworld}</Text>
-      {!!character.species.length && <Text>Species: {character.species}</Text>}
-    </InfoContainer>
-  </CardContainer>
-);
+      <Text>Mass: {character.mass}kg</Text>
+      <LikeContainer>
+        <LikesButton
+          isLiked={character.isLiked}
+          onPress={() => {
+            dispatch(toggleLike(character.url));
+          }}
+        />
+      </LikeContainer>
+    </CardContainer>
+  );
+};
 
-const CardContainer = styled.View`
-  margin-top: 10px;
+const CardContainer = styled.TouchableOpacity`
   width: 100%;
   padding-horizontal: 16px;
   padding-vertical: 14px;
@@ -37,9 +59,15 @@ const CardContainer = styled.View`
 `;
 
 const CharacterName = styled.Text`
-  font-size: ${theme.fontSizes.ll}px;
+  font-size: ${theme.fontSizes.l}px;
+  font-weight: 600;
+  margin-bottom: 10px;
 `;
 
-const InfoContainer = styled.View``;
+const LikeContainer = styled.View`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+`;
 
 export default CharacterCard;
