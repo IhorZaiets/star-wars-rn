@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { FlatList, ListRenderItem, Platform, SafeAreaView } from "react-native";
+import { FlatList, ListRenderItem, Platform } from "react-native";
 
 import styled from "styled-components/native";
 
@@ -14,7 +14,8 @@ import theme from "../../../theme";
 import CharacterCard from "../../feed/components/CharacterCard";
 import { resetLikes } from "../../feed/modules";
 import { getFavoriteCharacters } from "../../feed/modules/selectors";
-import { Character } from "../../feed/types";
+import { Character, Gender } from "../../feed/types";
+import GenderStatistics from "../components/GenderStatistics";
 
 const isAndroid = Platform.OS === "android";
 
@@ -31,8 +32,13 @@ const FavoriteScreen: FC = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SSafeAreaView>
       <SText>List of your favorite characters</SText>
+      <GenderStatisticsContainer>
+        <GenderStatistics gender={Gender.MALE} />
+        <GenderStatistics gender={Gender.FEMALE} />
+        <GenderStatistics gender={Gender.OTHER} />
+      </GenderStatisticsContainer>
       <FlatList
         data={favoriteCharacters}
         renderItem={renderItem}
@@ -48,9 +54,19 @@ const FavoriteScreen: FC = () => {
       <ButtonContainer>
         <Button label="Reset" onPress={handleReset} />
       </ButtonContainer>
-    </SafeAreaView>
+    </SSafeAreaView>
   );
 };
+
+const SSafeAreaView = styled.SafeAreaView`
+  flex: 1;
+`;
+
+const GenderStatisticsContainer = styled.View`
+  margin-top: 20px;
+  padding-horizontal: 16px;
+  gap: 10px;
+`;
 
 const SText = styled.Text`
   font-size: ${theme.fontSizes.xl}px;

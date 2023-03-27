@@ -26,6 +26,6 @@ export interface GetCharactersPayload {
 
 export enum Gender {
   MALE = "male",
-  FEMALE = "FEMALE",
+  FEMALE = "female",
   OTHER = "n/a",
 }
